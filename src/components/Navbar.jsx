@@ -126,11 +126,22 @@ function Navbar({ onCategoryNav }) {
   }
 
   // --- Modal Carrito ---
-  const cartTotal = cart.reduce((sum, p) => sum + (p.precioNormal || 0), 0);
+  // Calcular el total usando el precio de oferta si existe y es menor
+  const cartTotal = cart.reduce((sum, p) => {
+    if (p.precioOferta && p.precioOferta < p.precioNormal) {
+      return sum + p.precioOferta;
+    }
+    return sum + (p.precioNormal || 0);
+  }, 0);
   const cartWppMsg = encodeURIComponent(
     `¡Hola! 😊\n\n` +
     `Me gustaría hacer el siguiente pedido:\n\n` +
-    cart.map(p => `• ${p.nombre}${p.variante ? ` (${p.variante.color} - Talla ${p.variante.talla})` : ''} - $${p.precioNormal?.toLocaleString('es-CO') || ''}`).join('\n') +
+    cart.map(p => {
+      const precio = (p.precioOferta && p.precioOferta < p.precioNormal)
+        ? p.precioOferta
+        : p.precioNormal;
+      return `• ${p.nombre}${p.variante ? ` (${p.variante.color} - Talla ${p.variante.talla})` : ''} - $${precio?.toLocaleString('es-CO') || ''}`;
+    }).join('\n') +
     `\n\n*Total:* $${cartTotal.toLocaleString('es-CO')}\n\n` +
     `Quedo atento/a para coordinar el pago y la entrega. ¡Muchas gracias!`
   );
@@ -565,7 +576,16 @@ function Navbar({ onCategoryNav }) {
                         {item.variante && (
                           <div className="text-sm text-black/80">{item.variante.color} | Talla {item.variante.talla}</div>
                         )}
-                        <div className="text-gold font-bold text-base">${item.precioNormal?.toLocaleString()}</div>
+                        <div className="text-gold font-bold text-base">
+                          {item.precioOferta && item.precioOferta < item.precioNormal ? (
+                            <>
+                              <span className="line-through text-black/50 mr-2">${item.precioNormal?.toLocaleString()}</span>
+                              <span>${item.precioOferta?.toLocaleString()}</span>
+                            </>
+                          ) : (
+                            <>${item.precioNormal?.toLocaleString()}</>
+                          )}
+                        </div>
                       </div>
                       <button
                         className="text-red-500 hover:text-gold text-xl ml-2 p-0 bg-transparent border-none shadow-none"
