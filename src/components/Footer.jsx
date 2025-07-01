@@ -1,4 +1,9 @@
 import { FaFacebookF, FaInstagram, FaTiktok, FaWhatsapp } from 'react-icons/fa'
+import nequiImg from '../assets/nequi.png'
+import sistecreditoImg from '../assets/sistecredito-logo.png'
+import mastercardImg from '../assets/mastecard.png'
+import visaImg from '../assets/visa.png'
+import addiImg from '../assets/addi-logo.png'
 
 function Footer() {
   return (
@@ -13,16 +18,16 @@ function Footer() {
               </a>
               <span className="text-accent-gray text-base">+57 302 2815927</span>
             </div>
-            <p className="text-accent-gray">Horario: Lun-Sab 9am-7pm</p>
+            <p className="text-accent-gray">Horario: Lunes - Sábado 9 am - 7 pm</p>
           </div>
           <div className="flex flex-col items-center">
             <h4 className="text-gold font-bold mb-2 text-lg">Todas las formas de pago</h4>
             <div className="flex flex-wrap justify-center items-center gap-3 mt-2">
-              <img src={"/src/assets/nequi.png"} alt="Nequi" className="object-contain" style={{height: '40px', width: '90px', maxWidth: '90px'}} />
-              <img src={"/src/assets/sistecredito-logo.png"} alt="Sistecrédito" className="object-contain" style={{height: '48px', width: '64px', maxWidth: '64px'}} />
-              <img src={"/src/assets/mastecard.png"} alt="Mastercard" className="object-contain" style={{height: '32px', width: '64px', maxWidth: '64px'}} />
-              <img src={"/src/assets/visa.png"} alt="Visa" className="object-contain" style={{height: '32px', width: '64px', maxWidth: '64px'}} />
-              <img src={"/src/assets/addi-logo.png"} alt="Addi" className="object-contain" style={{height: '32px', width: '64px', maxWidth: '64px'}} />
+              <img src={nequiImg} alt="Nequi" className="object-contain" style={{height: '40px', width: '90px', maxWidth: '90px'}} />
+              <img src={sistecreditoImg} alt="Sistecrédito" className="object-contain" style={{height: '48px', width: '64px', maxWidth: '64px'}} />
+              <img src={mastercardImg} alt="Mastercard" className="object-contain" style={{height: '32px', width: '64px', maxWidth: '64px'}} />
+              <img src={visaImg} alt="Visa" className="object-contain" style={{height: '32px', width: '64px', maxWidth: '64px'}} />
+              <img src={addiImg} alt="Addi" className="object-contain" style={{height: '32px', width: '64px', maxWidth: '64px'}} />
             </div>
             <h4 className="text-gold font-bold mb-2 text-sm">Sistema de separado</h4>
 

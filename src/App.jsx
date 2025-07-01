@@ -6,13 +6,14 @@ import Footer from './components/Footer'
 import CategoryCard from './components/CategoryCard'
 import CategoryLanding from './components/CategoryLanding'
 import bgTexture from './assets/bg-texture.png'
-
+import logo from './assets/logo.png'
 function App() {
   const [selectedCategory, setSelectedCategory] = useState(null)
   const [categorias, setCategorias] = useState([])
   const [categoriaTree, setCategoriaTree] = useState({})
   const [mainCategories, setMainCategories] = useState([])
   const [productos, setProductos] = useState([])
+  const [showInfoModal, setShowInfoModal] = useState(true)
 
   // Cargar datos de la API
   useEffect(() => {
@@ -123,10 +124,26 @@ function App() {
   }
 
   return (
-    <div
-      className="bg-white min-h-screen flex flex-col"
-      
-    >
+    <div className="bg-white min-h-screen flex flex-col">
+      {/* Modal informativo al ingresar */}
+      {showInfoModal && (
+        <div className="fixed inset-0 bg-black/60 z-[999] flex items-center justify-center animate-fade-in-up">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-xs w-full flex flex-col items-center relative border-2 border-gold">
+            <button
+              className="absolute top-2 right-2 text-gold text-2xl p-0 bg-transparent border-none shadow-none hover:text-dark transition"
+              onClick={() => setShowInfoModal(false)}
+              aria-label="Cerrar"
+              type="button"
+            >
+              ×
+            </button>
+            <img src={logo} alt="CalzaOro logo" className="h-20 w-20 object-contain mb-4" />
+            <h2 className="text-xl font-bold text-gold text-center mb-2 font-serif">¿Cómo comprar?</h2>
+            <p className="text-black text-base text-center mb-2">Agrega los productos que te interesen al carrito y luego haz tu pedido fácilmente por <span className="font-bold text-green-600">WhatsApp</span>.</p>
+            <p className="text-black text-sm text-center">¡Así de simple! Si tienes dudas, escríbenos.</p>
+          </div>
+        </div>
+      )}
       <Navbar onCategoryNav={handleCategoryNav} />
       <main className="container mx-auto px-4 pt-20 sm:pt-28 pb-12 flex-1">
         <Hero />
@@ -136,7 +153,6 @@ function App() {
               <h2 className="text-3xl font-bold mb-8 text-black text-center font-serif">Categorías de productos</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
                 {mainCategories.map(cat => {
-                  // Obtener IDs de la categoría y todas sus subcategorías (hijos y nietos)
                   const subIds = [cat._id]
                   cat.subcategories?.forEach(sub => {
                     subIds.push(sub._id)
@@ -144,7 +160,6 @@ function App() {
                       subIds.push(ssub._id)
                     })
                   })
-                  // Filtrar productos que pertenezcan a la categoría o subcategorías
                   const catProducts = productos.filter(p => p.categoria && subIds.includes(p.categoria._id) && p.imagen)
                   const images = catProducts.map(p => p.imagen)
                   return (

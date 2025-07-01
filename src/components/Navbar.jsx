@@ -145,7 +145,7 @@ function Navbar({ onCategoryNav }) {
     `\n\n*Total:* $${cartTotal.toLocaleString('es-CO')}\n\n` +
     `Quedo atento/a para coordinar el pago y la entrega. ¡Muchas gracias!`
   );
-  const cartWppUrl = `https://wa.me/573234278294?text=${cartWppMsg}`;
+  const cartWppUrl = `https://wa.me/573022815927?text=${cartWppMsg}`;
 
   const handleMobileCatClick = (cat) => {
     setMobileSelectedCat(cat)
