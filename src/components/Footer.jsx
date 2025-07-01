@@ -1,5 +1,5 @@
 import { FaFacebookF, FaInstagram, FaTiktok, FaWhatsapp } from 'react-icons/fa'
-import nequiImg from '../assets/nequi.png'
+import nequiImg from '../assets/Nequi.png'
 import sistecreditoImg from '../assets/sistecredito-logo.png'
 import mastercardImg from '../assets/mastecard.png'
 import visaImg from '../assets/visa.png'
