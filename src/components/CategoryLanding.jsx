@@ -5,43 +5,94 @@ import { FaShoppingCart, FaHeart } from 'react-icons/fa'
 import zapatoImg from '../assets/zapato.jpg'
 import CategoryCard from './CategoryCard'
 
-function ProductCard({ product }) {
+function ProductCard({ product, categoriasMap }) {
   const { cart, addToCart, removeFromCart } = useCart()
   const { favorites, toggleFavorite } = useFavorites()
   const [showModal, setShowModal] = useState(false)
-  const [selectedVar, setSelectedVar] = useState(null)
+  const [manualTalla, setManualTalla] = useState("")
   const [error, setError] = useState("")
 
-  const inCart = cart.some(p => p._id === product._id && (!selectedVar || (p.variante && selectedVar && p.variante.color === selectedVar.color && p.variante.talla === selectedVar.talla)))
-  const inFavorites = favorites.some(p => p._id === product._id)
-
-  const variantes = product.variantes || []
-  const colores = [...new Set(variantes.map(v => v.color))]
-  const tallas = [...new Set(variantes.map(v => v.talla))]
-
-  const handleAddToCart = () => {
-    if (!selectedVar) {
-      setError("Selecciona color y talla")
-      return
+  // Mejorada: busca "calzado" en toda la jerarquía usando categoriasMap
+  function isCalzado(prod) {
+    let cat = prod.categoria
+    let intentos = 0
+    while (cat && intentos < 10) {
+      if (cat.nombre && cat.nombre.toLowerCase().includes("calzado")) return true
+      // Si tiene padre, busca en categoriasMap
+      if (cat.padre && categoriasMap && categoriasMap[cat.padre]) {
+        cat = categoriasMap[cat.padre]
+      } else {
+        break
+      }
+      intentos++
     }
-    if (selectedVar.stock <= 0) {
-      setError("Sin stock para esta variante")
-      return
-    }
-    addToCart({ ...product, variante: selectedVar })
-    setShowModal(false)
-    setError("")
+    return false
   }
 
-  const handleOpenModal = () => {
-    setShowModal(true)
-    setSelectedVar(null)
-    setError("")
+  // Toggle: si está en el carrito, lo quita; si no, lo agrega
+  const inCart = cart.some(p => {
+    if (isCalzado(product)) {
+      return p._id === product._id && p.variante && p.variante.talla === manualTalla
+    } else {
+      return p._id === product._id && !p.variante
+    }
+  })
+  const inFavorites = favorites.some(p => p._id === product._id)
+
+  const handleAddToCart = () => {
+    if (isCalzado(product)) {
+      if (!manualTalla.trim()) {
+        setError("Por favor escribe la talla")
+        return
+      }
+      addToCart({ ...product, variante: { talla: manualTalla } })
+      setShowModal(false)
+      setError("")
+      setManualTalla("")
+    } else {
+      addToCart(product)
+    }
+  }
+
+  // Nuevo: toggle del carrito
+  const handleCartClick = () => {
+    if (isCalzado(product)) {
+      setShowModal(true)
+      setManualTalla("")
+      setError("")
+    } else {
+      // Si ya está en el carrito, quitarlo
+      if (cart.some(p => p._id === product._id && !p.variante)) {
+        removeFromCart(product._id)
+        return
+      }
+      handleAddToCart()
+    }
+  }
+
+  // En el modal, si ya está en el carrito con esa talla, quitarlo; si no, agregarlo
+  const handleAddOrRemoveCalzado = () => {
+    if (!manualTalla.trim()) {
+      setError("Por favor escribe la talla")
+      return
+    }
+    const yaEnCarrito = cart.some(p => p._id === product._id && p.variante && p.variante.talla === manualTalla)
+    if (yaEnCarrito) {
+      removeFromCart(product._id, { talla: manualTalla })
+      setShowModal(false)
+      setManualTalla("")
+      setError("")
+    } else {
+      addToCart({ ...product, variante: { talla: manualTalla } })
+      setShowModal(false)
+      setManualTalla("")
+      setError("")
+    }
   }
 
   return (
     <div className="flex flex-col items-center bg-white border border-gold rounded-2xl p-4 shadow-lg hover:shadow-xl transition-shadow group">
-      <div className="w-full aspect-square overflow-hidden rounded-xl mb-3 cursor-pointer" onClick={handleOpenModal}>
+      <div className="w-full aspect-square overflow-hidden rounded-xl mb-3 cursor-pointer" onClick={handleCartClick}>
         <img
           src={product.imagen || zapatoImg}
           alt={product.nombre}
@@ -73,7 +124,7 @@ function ProductCard({ product }) {
           </button>
           <button
             className={`text-3xl bg-transparent p-0 m-0 shadow-none border-none transition ${inCart ? 'text-black' : 'text-gold hover:text-black'}`}
-            onClick={handleOpenModal}
+            onClick={handleCartClick}
             aria-label={inCart ? "Quitar del carrito" : "Agregar al carrito"}
             style={{ background: 'transparent' }}
           >
@@ -81,58 +132,25 @@ function ProductCard({ product }) {
           </button>
         </div>
       </div>
-      {/* Modal de variantes */}
-      {showModal && (
+      {/* Modal de talla solo para calzado */}
+      {showModal && isCalzado(product) && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-xs relative animate-fade-in">
-            <button className="absolute top-2 right-2 text- bg-transparent text-black text-xl font-bold" onClick={() => setShowModal(false)}>&times;</button>
-            <h3 className="text-lg font-bold text-gold mb-2 font-serif">Selecciona variante</h3>
-            <div className="mb-2">
-              <label className="block text-black font-semibold mb-1">Color:</label>
-              <select
-                className="border rounded px-2 py-1 w-full text-black"
-                value={selectedVar?.color || ''}
-                onChange={e => {
-                  const color = e.target.value
-                  const talla = selectedVar?.talla
-                  const variante = variantes.find(v => v.color === color && (!talla || v.talla === talla)) || variantes.find(v => v.color === color)
-                  setSelectedVar(variante)
-                  setError("")
-                }}
-              >
-                <option value="">Selecciona color</option>
-                {colores.map((c, i) => (
-                  <option key={i} value={c}>{c}</option>
-                ))}
-              </select>
-            </div>
-            <div className="mb-2">
-              <label className="block text-black font-semibold mb-1">Talla:</label>
-              <select
-                className="border rounded px-2 py-1 w-full text-black"
-                value={selectedVar?.talla || ''}
-                onChange={e => {
-                  const talla = e.target.value
-                  const color = selectedVar?.color
-                  const variante = variantes.find(v => v.talla === talla && (!color || v.color === color)) || variantes.find(v => v.talla === talla)
-                  setSelectedVar(variante)
-                  setError("")
-                }}
-              >
-                <option value="">Selecciona talla</option>
-                {tallas.map((t, i) => (
-                  <option key={i} value={t}>{t}</option>
-                ))}
-              </select>
-            </div>
-            {selectedVar && (
-              <div className="mb-2 text-black text-sm">Stock: <span className={selectedVar.stock > 0 ? 'text-green-600' : 'text-red-600'}>{selectedVar.stock}</span></div>
-            )}
+            <button className="absolute top-2 right-2 bg-transparent text-black text-xl font-bold" onClick={() => setShowModal(false)}>&times;</button>
+            <h3 className="text-lg font-bold text-gold mb-2 font-serif">Escribe la talla</h3>
+            <input
+              type="text"
+              className="border rounded px-2 py-1 w-full text-black mb-2"
+              placeholder="Ej: 38, 39, 40..."
+              value={manualTalla}
+              onChange={e => { setManualTalla(e.target.value); setError("") }}
+              autoFocus
+            />
             {error && <div className="text-red-500 text-sm mb-2">{error}</div>}
             <button
               className="w-full bg-gold text-dark font-bold py-2 rounded mt-2 hover:bg-dark hover:text-gold transition"
-              onClick={handleAddToCart}
-            >Agregar al carrito</button>
+              onClick={handleAddOrRemoveCalzado}
+            >{cart.some(p => p._id === product._id && p.variante && p.variante.talla === manualTalla) ? 'Quitar del carrito' : 'Agregar al carrito'}</button>
           </div>
         </div>
       )}
@@ -272,7 +290,7 @@ function CategoryLanding({ category, onBack, initialSub, initialSubSub }) {
   }
 
   // Si estamos en una subcategoría SIN sub-subcategorías
-  if (selectedSub && !selectedSub.subcategories) {
+  if (selectedSub && (!selectedSub.subcategories || selectedSub.subcategories.length === 0)) {
     // Filtra productos por categoría
     const filteredProducts = productos.filter(
       p => p.categoria?._id === selectedSub._id && p.activa
@@ -290,7 +308,7 @@ function CategoryLanding({ category, onBack, initialSub, initialSubSub }) {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
           {filteredProducts.length > 0 ? (
             filteredProducts.map(product => (
-              <ProductCard key={product._id} product={product} />
+              <ProductCard key={product._id} product={product} categoriasMap={categoriasMap} />
             ))
           ) : (
             <div className="col-span-full text-center text-black">No hay productos en esta subcategoría.</div>
@@ -319,7 +337,7 @@ function CategoryLanding({ category, onBack, initialSub, initialSubSub }) {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
           {filteredProducts.length > 0 ? (
             filteredProducts.map(product => (
-              <ProductCard key={product._id} product={product} />
+              <ProductCard key={product._id} product={product} categoriasMap={categoriasMap} />
             ))
           ) : (
             <div className="col-span-full text-center text-black">No hay productos en esta subcategoría.</div>

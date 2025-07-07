@@ -715,57 +715,6 @@ function AdminDashboard() {
                 required
               />
               
-              <div className="border border-gold/30 rounded-lg p-4">
-                <label className="font-bold text-black mb-3 block">Variantes:</label>
-                <div className="flex flex-col gap-3">
-                  {prodData.variantes.map((v, i) => (
-                    <div
-                      key={i}
-                      className="grid grid-cols-1 md:grid-cols-[1fr_1fr_100px_80px] gap-2 w-full items-end"
-                    >
-                      <input
-                        type="text"
-                        placeholder="Color"
-                        className="border rounded-lg px-3 py-2 text-black w-full"
-                        value={v.color}
-                        onChange={(e) => handleVarianteChange(i, "color", e.target.value)}
-                      />
-                      <input
-                        type="text"
-                        placeholder="Talla"
-                        className="border rounded-lg px-3 py-2 text-black w-full"
-                        value={v.talla}
-                        onChange={(e) => handleVarianteChange(i, "talla", e.target.value)}
-                      />
-                      <input
-                        type="number"
-                        placeholder="Stock"
-                        className="border rounded-lg px-3 py-2 text-black w-full"
-                        value={v.stock}
-                        min={0}
-                        onChange={(e) => handleVarianteChange(i, "stock", e.target.value)}
-                      />
-                      {prodData.variantes.length > 1 && (
-                        <button
-                          type="button"
-                          className="text-red-500 font-bold px-3 py-2 rounded-lg bg-red-50 hover:bg-red-100 transition w-full"
-                          onClick={() => quitarVariante(i)}
-                        >
-                          Quitar
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-                <button
-                  type="button"
-                  className="text-gold font-bold mt-3 hover:text-dark transition"
-                  onClick={agregarVariante}
-                >
-                  + Agregar variante
-                </button>
-              </div>
-              
               <button className="bg-gold text-dark font-bold py-3 rounded-lg shadow border-2 border-gold hover:bg-dark hover:text-gold transition">
                 Crear Producto
               </button>
@@ -905,57 +854,6 @@ function AdminDashboard() {
                   onChange={e => setEditProdImagen(e.target.files[0])}
                 />
                 <p className="text-sm text-gray-600 mt-2">Deja vacío para mantener la imagen actual</p>
-              </div>
-              
-              <div className="border border-gold/30 rounded-lg p-4">
-                <label className="font-bold text-black mb-3 block">Variantes:</label>
-                <div className="flex flex-col gap-3">
-                  {prodData.variantes.map((v, i) => (
-                    <div
-                      key={i}
-                      className="grid grid-cols-1 md:grid-cols-[1fr_1fr_100px_80px] gap-2 w-full items-end"
-                    >
-                      <input
-                        type="text"
-                        placeholder="Color"
-                        className="border rounded-lg px-3 py-2 text-black w-full"
-                        value={v.color}
-                        onChange={(e) => handleVarianteChange(i, "color", e.target.value)}
-                      />
-                      <input
-                        type="text"
-                        placeholder="Talla"
-                        className="border rounded-lg px-3 py-2 text-black w-full"
-                        value={v.talla}
-                        onChange={(e) => handleVarianteChange(i, "talla", e.target.value)}
-                      />
-                      <input
-                        type="number"
-                        placeholder="Stock"
-                        className="border rounded-lg px-3 py-2 text-black w-full"
-                        value={v.stock}
-                        min={0}
-                        onChange={(e) => handleVarianteChange(i, "stock", e.target.value)}
-                      />
-                      {prodData.variantes.length > 1 && (
-                        <button
-                          type="button"
-                          className="text-red-500 font-bold px-3 py-2 rounded-lg bg-red-50 hover:bg-red-100 transition w-full"
-                          onClick={() => quitarVariante(i)}
-                        >
-                          Quitar
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-                <button
-                  type="button"
-                  className="text-gold font-bold mt-3 hover:text-dark transition"
-                  onClick={agregarVariante}
-                >
-                  + Agregar variante
-                </button>
               </div>
               
               <button className="bg-gold text-dark font-bold py-3 rounded-lg shadow border-2 border-gold hover:bg-dark hover:text-gold transition">

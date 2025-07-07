@@ -140,7 +140,7 @@ function Navbar({ onCategoryNav }) {
       const precio = (p.precioOferta && p.precioOferta < p.precioNormal)
         ? p.precioOferta
         : p.precioNormal;
-      return `• ${p.nombre}${p.variante ? ` (${p.variante.color} - Talla ${p.variante.talla})` : ''} - $${precio?.toLocaleString('es-CO') || ''}`;
+      return `• ${p.nombre}${p.variante && p.variante.talla ? ` (Talla: ${p.variante.talla})` : ''} - $${precio?.toLocaleString('es-CO') || ''}`;
     }).join('\n') +
     `\n\n*Total:* $${cartTotal.toLocaleString('es-CO')}\n\n` +
     `Quedo atento/a para coordinar el pago y la entrega. ¡Muchas gracias!`
