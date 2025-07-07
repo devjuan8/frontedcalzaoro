@@ -286,27 +286,47 @@ function Navbar({ onCategoryNav }) {
                     </div>
                     {/* Subcategorías en columnas */}
                     {cat.subcategories && cat.subcategories.length > 0 && (
-                      <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-8 pl-8">
+                      <div
+                        className="flex-1 grid gap-8 pl-8"
+                        style={{
+                          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                          maxHeight: '420px',
+                          overflowY: 'auto',
+                        }}
+                      >
                         {cat.subcategories.map(sub => (
                           <div key={sub._id}>
-                            <div className="font-bold text-dark mb-2 text-lg">{sub.nombre}</div>
-                            {sub.subcategories && sub.subcategories.length > 0 && (
-                              <ul>
-                                {sub.subcategories.map(ssub => (
-                                  <li key={ssub._id}>
-                                    <button
-                                      className="bg-transparent border-none outline-none text-dark hover:text-gold transition text-base font-normal mb-1 text-left p-0"
-                                      style={{ boxShadow: 'none', background: 'none' }}
-                                      onClick={() => {
-                                        onCategoryNav(cat, sub, ssub)
-                                        setHovered(null)
-                                      }}
-                                    >
-                                      {ssub.nombre}
-                                    </button>
-                                  </li>
-                                ))}
-                              </ul>
+                            {sub.subcategories && sub.subcategories.length > 0 ? (
+                              <>
+                                <div className="font-bold text-dark mb-2 text-lg">{sub.nombre}</div>
+                                <ul>
+                                  {sub.subcategories.map(ssub => (
+                                    <li key={ssub._id}>
+                                      <button
+                                        className="bg-transparent border-none outline-none text-dark hover:text-gold transition text-base font-normal mb-1 text-left p-0"
+                                        style={{ boxShadow: 'none', background: 'none' }}
+                                        onClick={() => {
+                                          onCategoryNav(cat, sub, ssub)
+                                          setHovered(null)
+                                        }}
+                                      >
+                                        {ssub.nombre}
+                                      </button>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </>
+                            ) : (
+                              <button
+                                className="font-bold text-dark mb-2 text-lg hover:text-gold transition"
+                                style={{ background: 'none', border: 'none', padding: 0, textAlign: 'left' }}
+                                onClick={() => {
+                                  onCategoryNav(cat, sub)
+                                  setHovered(null)
+                                }}
+                              >
+                                {sub.nombre}
+                              </button>
                             )}
                           </div>
                         ))}
