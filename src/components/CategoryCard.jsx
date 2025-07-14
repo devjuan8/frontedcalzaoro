@@ -42,7 +42,7 @@ function ProductCarousel({ images, alt }) {
       <img
         src={images[index]}
         alt={alt || "Imagen producto"}
-        className="w-full h-full object-cover object-center transition-all duration-500 rounded-2xl"
+        className="w-full h-full object-contain object-center transition-all duration-500 rounded-2xl bg-white"
       />
       {images.length > 1 && (
         <>

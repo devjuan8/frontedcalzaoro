@@ -11,6 +11,8 @@ function ProductCard({ product, categoriasMap }) {
   const [showModal, setShowModal] = useState(false)
   const [manualTalla, setManualTalla] = useState("")
   const [error, setError] = useState("")
+  // Estado para mostrar imagen completa
+  const [showImageModal, setShowImageModal] = useState(false)
 
   // Mejorada: busca "calzado" en toda la jerarquía usando categoriasMap
   function isCalzado(prod) {
@@ -96,7 +98,9 @@ function ProductCard({ product, categoriasMap }) {
         <img
           src={product.imagen || zapatoImg}
           alt={product.nombre}
-          className="w-full h-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
+          className="w-full h-full object-contain object-center transition-transform duration-300 group-hover:scale-105 bg-white"
+          onClick={e => { e.stopPropagation(); setShowImageModal(true); }}
+          style={{ cursor: 'zoom-in' }}
         />
       </div>
       <div className="w-full text-center">
@@ -132,6 +136,22 @@ function ProductCard({ product, categoriasMap }) {
           </button>
         </div>
       </div>
+      {/* Modal para ver imagen completa */}
+      {showImageModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70" onClick={() => setShowImageModal(false)}>
+          <div className="bg-white rounded-2xl shadow-lg p-4 max-w-2xl w-full flex flex-col items-center relative animate-fade-in" onClick={e => e.stopPropagation()}>
+            <button className="absolute top-2 right-2 bg-transparent text-black text-xl font-bold" onClick={() => setShowImageModal(false)}>&times;</button>
+            <img
+              src={product.imagen || zapatoImg}
+              alt={product.nombre}
+              className="w-full max-h-[80vh] object-contain rounded-xl"
+              style={{ background: '#fff' }}
+            />
+            <div className="mt-2 text-center text-black font-bold">{product.nombre}</div>
+            <div className="text-black/70 text-sm text-center">{product.descripcion}</div>
+          </div>
+        </div>
+      )}
       {/* Modal de talla solo para calzado */}
       {showModal && isCalzado(product) && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
