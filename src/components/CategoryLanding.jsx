@@ -199,6 +199,7 @@ function CategoryLanding({ category, onBack, initialSub, initialSubSub }) {
   const [productos, setProductos] = useState([])
   const [categoriasMap, setCategoriasMap] = useState({})
 
+
   // Cargar productos y categorías de la API
   useEffect(() => {
     const fetchProductos = async () => {
@@ -231,12 +232,24 @@ function CategoryLanding({ category, onBack, initialSub, initialSubSub }) {
 
   // Si recibimos initialSub/initialSubSub, seleccionarlos automáticamente
   useEffect(() => {
-    if (initialSub) setSelectedSub(initialSub)
-    if (initialSubSub) setSelectedSubSub(initialSubSub)
+    if (initialSub) {
+      console.log('Estableciendo initialSub:', initialSub)
+      setSelectedSub(initialSub)
+    }
+    if (initialSubSub) {
+      console.log('Estableciendo initialSubSub:', initialSubSub)
+      setSelectedSubSub(initialSubSub)
+    }
   }, [initialSub, initialSubSub])
+
+  // Log cuando selectedSub cambia
+  useEffect(() => {
+    console.log('selectedSub cambió a:', selectedSub)
+  }, [selectedSub])
 
   // Si estamos en la raíz de la categoría
   if (!selectedSub) {
+    console.log('Entrando en raíz de categoría')
     return (
       <div className="rounded-2xl p-8 border-2 border-gold shadow-lg mt-8 bg-white">
         <button
@@ -253,11 +266,15 @@ function CategoryLanding({ category, onBack, initialSub, initialSubSub }) {
             // Filtrar productos que pertenezcan a esos ids
             const subProducts = productos.filter(p => p.categoria && ids.includes(p.categoria._id) && p.imagen)
             const images = subProducts.map(p => p.imagen)
+   
             return (
               <div
                 key={sub._id}
                 className="flex flex-col items-center cursor-pointer bg-transparent shadow-none border-none"
-                onClick={() => setSelectedSub(sub)}
+                onClick={() => {
+                  console.log('Haciendo clic en subcategoría:', sub.nombre, sub)
+                  setSelectedSub(sub)
+                }}
               >
                 <CategoryCard
                   name={sub.nombre}
@@ -274,7 +291,8 @@ function CategoryLanding({ category, onBack, initialSub, initialSubSub }) {
   }
 
   // Si estamos en una subcategoría con sub-subcategorías
-  if (selectedSub && selectedSub.subcategories && !selectedSubSub) {
+  if (selectedSub && selectedSub.subcategories && selectedSub.subcategories.length > 0 && !selectedSubSub) {
+  
     return (
       <div className="rounded-2xl p-8 border-2 border-gold shadow-lg mt-8 bg-white">
         <button
@@ -289,6 +307,9 @@ function CategoryLanding({ category, onBack, initialSub, initialSubSub }) {
             const ids = getAllCategoryIds(ssub, categoriasMap)
             const subProducts = productos.filter(p => p.categoria && ids.includes(p.categoria._id) && p.imagen)
             const images = subProducts.map(p => p.imagen)
+            console.log(`Sub-subcategoría ${ssub.nombre}:`, ssub)
+            console.log(`IDs para ${ssub.nombre}:`, ids)
+            console.log(`Productos para ${ssub.nombre}:`, subProducts.length)
             return (
               <div
                 key={ssub._id}
@@ -311,10 +332,14 @@ function CategoryLanding({ category, onBack, initialSub, initialSubSub }) {
 
   // Si estamos en una subcategoría SIN sub-subcategorías
   if (selectedSub && (!selectedSub.subcategories || selectedSub.subcategories.length === 0)) {
-    // Filtra productos por categoría
+    console.log('Entrando en subcategoría SIN sub-subcategorías')
+    // Obtener todos los ids de la subcategoría y descendientes
+    const ids = getAllCategoryIds(selectedSub, categoriasMap)
+    // Filtra productos por categoría incluyendo descendientes
     const filteredProducts = productos.filter(
-      p => p.categoria?._id === selectedSub._id && p.activa
+      p => p.categoria && ids.includes(p.categoria._id) && p.activa
     )
+
 
     return (
       <div className="rounded-2xl p-8 border-2 border-gold shadow-lg mt-8 bg-white">
@@ -331,7 +356,21 @@ function CategoryLanding({ category, onBack, initialSub, initialSubSub }) {
               <ProductCard key={product._id} product={product} categoriasMap={categoriasMap} />
             ))
           ) : (
-            <div className="col-span-full text-center text-black">No hay productos en esta subcategoría.</div>
+            <div className="col-span-full text-center text-black">
+              No hay productos en esta subcategoría.
+              <br />
+              <small className="text-gray-500">
+                Debug: selectedSub._id = {selectedSub._id}
+                <br />
+                Total productos: {productos.length}
+                <br />
+                Productos activos: {productos.filter(p => p.activa).length}
+                <br />
+                Productos con categoría: {productos.filter(p => p.categoria).length}
+                <br />
+                IDs de categoría incluidos: {ids.join(', ')}
+              </small>
+            </div>
           )}
         </div>
       </div>
@@ -340,10 +379,17 @@ function CategoryLanding({ category, onBack, initialSub, initialSubSub }) {
 
   // Si estamos en una sub-subcategoría, mostramos productos
   if (selectedSub && selectedSubSub) {
-    // Filtra productos por sub-subcategoría
+    console.log('Entrando en sub-subcategoría')
+    console.log('SelectedSubSub:', selectedSubSub)
+    // Obtener todos los ids de la sub-subcategoría y descendientes
+    const ids = getAllCategoryIds(selectedSubSub, categoriasMap)
+    // Filtra productos por sub-subcategoría incluyendo descendientes
     const filteredProducts = productos.filter(
-      p => p.categoria?._id === selectedSubSub._id && p.activa
+      p => p.categoria && ids.includes(p.categoria._id) && p.activa
     )
+
+    console.log('Filtered products for sub-sub:', filteredProducts.length)
+    console.log('IDs for sub-sub:', ids)
 
     return (
       <div className="rounded-2xl p-8 border-2 border-gold shadow-lg mt-8 bg-white">

@@ -64,16 +64,6 @@ function ProductCarousel({ images, alt }) {
           </button>
         </>
       )}
-      {images.length > 1 && (
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-          {images.map((_, i) => (
-            <span
-              key={i}
-              className={`w-2 h-2 rounded-full ${i === index ? 'bg-gold' : 'bg-gray-300'} block`}
-            />
-          ))}
-        </div>
-      )}
     </div>
   )
 }
