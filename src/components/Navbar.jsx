@@ -243,74 +243,95 @@ function Navbar({ onCategoryNav }) {
   }
 
   return (
-    <nav className="bg-white border-b border-gold fixed w-full top-0 left-0 z-50 font-sans">
-      <div className="container mx-auto flex items-center justify-between px-2 py-2">
-        {/* Logo grande sin borde */}
-        <div className="flex items-center gap-2 min-w-0">
+    <nav className="bg-white border-b-2 border-gold/30 fixed w-full top-0 left-0 z-[9999] font-sans shadow-lg">
+      <div className="container mx-auto flex items-center justify-between px-2 py-3">
+        {/* Logo grande con efecto de brillo */}
+        <div className="flex items-center gap-3 min-w-0 group">
           <a href="/" onClick={() => window.location.href = '/'} className="flex items-center">
-            <img src={logo} alt="CalzaOro logo" className="h-16 w-16 sm:h-20 sm:w-20 object-contain" />
+            <div className="relative">
+              <img src={logo} alt="CalzaOro logo" className="h-16 w-16 sm:h-20 sm:w-20 object-contain transition-transform duration-300 group-hover:scale-105" />
+              <div className="absolute inset-0 bg-gold/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            </div>
           </a>
-          <span className="text-2xl font-extrabold text-gold tracking-tight font-serif hidden sm:inline ml-1">CalzaOro</span>
+          <span className="text-2xl font-extrabold text-gold tracking-tight font-serif hidden sm:inline ml-1 bg-gradient-to-r from-gold to-yellow-500 bg-clip-text text-transparent">
+            CalzaOro
+          </span>
         </div>
-        {/* Menú principal */}
-        <ul className="hidden md:flex gap-6 items-center text-dark text-base relative">
+        
+        {/* Menú principal con efectos mejorados */}
+        <ul className="hidden md:flex gap-8 items-center text-dark text-base relative">
           {mainCategories.map(cat => (
             <li
               key={cat._id}
-              className="relative"
+              className="relative group"
               onMouseEnter={() => setHovered(cat._id)}
             >
               <button
-                className={`uppercase px-2 py-1 transition bg-transparent shadow-none border-none outline-none font-bold ${hovered === cat._id ? 'text-gold' : 'text-dark'}`}
+                className={`uppercase px-3 py-2 transition-all duration-300 bg-transparent shadow-none border-none outline-none font-bold rounded-lg hover:bg-gold/10 hover:text-gold relative overflow-hidden ${
+                  hovered === cat._id ? 'text-gold bg-gold/10' : 'text-dark'
+                }`}
                 onClick={() => onCategoryNav(cat)}
               >
-                {cat.nombre}
+                <span className="relative z-10">{cat.nombre}</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-gold/20 to-yellow-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg"></div>
               </button>
-              {/* Mega menú */}
+              
+              {/* Mega menú con mejor diseño */}
               {hovered === cat._id && (
                 <div
-                  className="fixed left-0 right-0 bottom-0 top-[88px] bg-white/95 z-50 flex justify-center items-start pt-10 animate-fade-in-up"
+                  className="fixed left-0 right-0 bottom-0 top-[88px] bg-white z-[9998] flex justify-center items-start pt-10 animate-fade-in-up border-t-2 border-gold/20 shadow-2xl"
                   onMouseEnter={() => setHovered(cat._id)}
                   onMouseLeave={() => setHovered(null)}
                 >
-                  <div className="w-full max-w-6xl mx-auto flex px-10 py-10 gap-10">
-                    {/* Columna izquierda */}
-                    <div className="hidden md:flex flex-col items-center justify-start pr-10 border-r border-gold min-w-[220px]">
-                      <img src={logo} alt="Colección" className="w-28 h-28 object-contain mb-4" />
-                      <span className="font-bold text-gold text-lg mb-2">Colecciones</span>
-                      <ul className="text-dark text-base">
-                        <li className="mb-1 hover:text-gold cursor-pointer">Novedades</li>
-                        <li className="mb-1 hover:text-gold cursor-pointer">Ofertas</li>
-                        <li className="mb-1 hover:text-gold cursor-pointer">Más vendidos</li>
+                  <div className="w-full max-w-6xl mx-auto flex px-10 py-12 gap-12">
+                    {/* Columna izquierda con mejor diseño */}
+                    <div className="hidden md:flex flex-col items-center justify-start pr-12 border-r-2 border-gold/30 min-w-[240px]">
+                      <div className="relative mb-6">
+                        <img src={logo} alt="Colección" className="w-32 h-32 object-contain" />
+                        <div className="absolute inset-0 bg-gold/20 rounded-full blur-xl opacity-60"></div>
+                      </div>
+                      <span className="font-bold text-gold text-xl mb-4 bg-gradient-to-r from-gold to-yellow-500 bg-clip-text text-transparent">
+                        Colecciones
+                      </span>
+                      <ul className="text-dark text-base space-y-2">
+                        <li className="mb-2 hover:text-gold cursor-pointer transition-colors duration-300 hover:translate-x-1 transform">✨ Novedades</li>
+                        <li className="mb-2 hover:text-gold cursor-pointer transition-colors duration-300 hover:translate-x-1 transform">🔥 Ofertas</li>
+                        <li className="mb-2 hover:text-gold cursor-pointer transition-colors duration-300 hover:translate-x-1 transform">⭐ Más vendidos</li>
                       </ul>
                     </div>
-                    {/* Subcategorías en columnas */}
+                    
+                    {/* Subcategorías con mejor organización */}
                     {cat.subcategories && cat.subcategories.length > 0 && (
                       <div
-                        className="flex-1 grid gap-8 pl-8"
+                        className="flex-1 grid gap-10 pl-10"
                         style={{
-                          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-                          maxHeight: '420px',
+                          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                          maxHeight: '480px',
                           overflowY: 'auto',
                         }}
                       >
                         {cat.subcategories.map(sub => (
-                          <div key={sub._id}>
+                          <div key={sub._id} className="group/sub">
                             {sub.subcategories && sub.subcategories.length > 0 ? (
                               <>
-                                <div className="font-bold text-dark mb-2 text-lg">{sub.nombre}</div>
-                                <ul>
+                                <div className="font-bold text-dark mb-4 text-lg group-hover/sub:text-gold transition-colors duration-300">
+                                  {sub.nombre}
+                                </div>
+                                <ul className="space-y-2">
                                   {sub.subcategories.map(ssub => (
                                     <li key={ssub._id}>
                                       <button
-                                        className="bg-transparent border-none outline-none text-dark hover:text-gold transition text-base font-normal mb-1 text-left p-0"
+                                        className="bg-transparent border-none outline-none text-dark hover:text-gold transition-all duration-300 text-base font-normal mb-2 text-left p-0 hover:translate-x-2 transform group-hover/sub:translate-x-1"
                                         style={{ boxShadow: 'none', background: 'none' }}
                                         onClick={() => {
                                           onCategoryNav(cat, sub, ssub)
                                           setHovered(null)
                                         }}
                                       >
-                                        {ssub.nombre}
+                                        <span className="relative">
+                                          {ssub.nombre}
+                                          <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-gold to-yellow-500 group-hover/sub:w-full transition-all duration-300"></div>
+                                        </span>
                                       </button>
                                     </li>
                                   ))}
@@ -318,14 +339,17 @@ function Navbar({ onCategoryNav }) {
                               </>
                             ) : (
                               <button
-                                className="font-bold text-dark mb-2 text-lg hover:text-gold transition"
+                                className="font-bold text-dark mb-4 text-lg hover:text-gold transition-all duration-300 group-hover/sub:text-gold"
                                 style={{ background: 'none', border: 'none', padding: 0, textAlign: 'left' }}
                                 onClick={() => {
                                   onCategoryNav(cat, sub)
                                   setHovered(null)
                                 }}
                               >
-                                {sub.nombre}
+                                <span className="relative">
+                                  {sub.nombre}
+                                  <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-gold to-yellow-500 group-hover/sub:w-full transition-all duration-300"></div>
+                                </span>
                               </button>
                             )}
                           </div>
@@ -338,76 +362,86 @@ function Navbar({ onCategoryNav }) {
             </li>
           ))}
         </ul>
-        {/* Buscador + iconos */}
-        <div className="flex items-center gap-2">
-          <div className="hidden md:flex items-center bg-white rounded-full px-2 py-1 border border-gold min-w-0 max-w-[180px] mx-2 relative">
-            <FaSearch className="text-gold mr-1 text-base" />
+        
+        {/* Buscador + iconos con mejor diseño */}
+        <div className="flex items-center gap-3">
+          <div className="hidden md:flex items-center bg-white rounded-full px-4 py-2 border-2 border-gold/30 min-w-0 max-w-[200px] mx-2 relative hover:border-gold/60 transition-all duration-300 focus-within:border-gold focus-within:shadow-lg">
+            <FaSearch className="text-gold mr-2 text-base" />
             <input
               type="text"
-              placeholder="Buscar..."
-              className="bg-transparent outline-none text-dark placeholder:text-warm-gray w-full min-w-0 text-xs"
-              style={{ fontWeight: 500 }}
+              placeholder="Buscar productos..."
+              className="bg-transparent outline-none text-dark placeholder:text-gray-500 w-full min-w-0 text-sm font-medium"
               value={search}
               onChange={handleSearchChange}
               onFocus={() => search && setShowSearchResults(true)}
               onBlur={() => setTimeout(() => setShowSearchResults(false), 150)}
             />
             {showSearchResults && searchResults.length > 0 && (
-              <ul className="absolute left-0 top-12 w-full bg-white border border-gold rounded shadow z-50 max-h-60 overflow-y-auto">
+              <ul className="absolute left-0 top-14 w-full bg-white border-2 border-gold/30 rounded-2xl shadow-2xl z-[9998] max-h-60 overflow-y-auto">
                 {searchResults.map(product => (
                   <li
                     key={product._id}
-                    className="flex items-center gap-2 px-3 py-2 hover:bg-gold/20 cursor-pointer text-black text-sm"
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-gold/10 cursor-pointer text-black text-sm transition-colors duration-200 border-b border-gold/10 last:border-b-0"
                     onMouseDown={() => handleSearchSelect(product)}
                   >
                     <img
                       src={product.imagen}
                       alt={product.nombre}
-                      className="w-8 h-8 object-cover rounded border border-gold"
+                      className="w-10 h-10 object-cover rounded-lg border border-gold/30"
                     />
-                    <span>{product.nombre}</span>
+                    <span className="font-medium">{product.nombre}</span>
                   </li>
                 ))}
               </ul>
             )}
             {showSearchResults && searchResults.length === 0 && (
-              <div className="absolute left-0 top-12 w-full bg-white border border-gold rounded shadow z-50 px-3 py-2 text-black text-sm">
+              <div className="absolute left-0 top-14 w-full bg-white border-2 border-gold/30 rounded-2xl shadow-2xl z-[9998] px-4 py-3 text-black text-sm text-center">
                 No se encontraron productos.
               </div>
             )}
           </div>
+          
+          {/* Iconos con efectos mejorados */}
           <button
-            className="relative text-black hover:text-gold transition text-2xl p-0 bg-transparent ml-2"
+            className="relative text-black hover:text-gold transition-all duration-300 text-2xl p-2 bg-transparent rounded-full hover:bg-gold/10 group"
             onClick={() => setShowCart(true)}
           >
-            <FaShoppingCart />
+            <FaShoppingCart className="group-hover:scale-110 transition-transform duration-300" />
             {cart.length > 0 && (
-              <span className="absolute -top-2 -right-2 bg-gold text-white text-xs rounded-full px-1">{cart.length}</span>
+              <span className="absolute -top-1 -right-1 bg-gradient-to-r from-gold to-yellow-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold shadow-lg animate-pulse">
+                {cart.length}
+              </span>
             )}
           </button>
+          
           <button
-            className="relative text-gold hover:text-dark transition text-2xl p-0 bg-transparent"
+            className="relative text-gold hover:text-dark transition-all duration-300 text-2xl p-2 bg-transparent rounded-full hover:bg-gold/10 group"
             onClick={() => setShowFavorites(true)}
           >
-            <FaHeart />
+            <FaHeart className="group-hover:scale-110 transition-transform duration-300" />
             {favorites.length > 0 && (
-              <span className="absolute -top-2 -right-2 bg-gold text-white text-xs rounded-full px-1">{favorites.length}</span>
+              <span className="absolute -top-1 -right-1 bg-gradient-to-r from-pink-500 to-red-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold shadow-lg animate-pulse">
+                {favorites.length}
+              </span>
             )}
           </button>
-          <button className="text-black hover:text-gold transition text-2xl p-0 bg-transparent"
+          
+          <button 
+            className="text-black hover:text-gold transition-all duration-300 text-2xl p-2 bg-transparent rounded-full hover:bg-gold/10 group"
             onClick={() => setShowLogin(true)}
           >
-            <FaUser />
+            <FaUser className="group-hover:scale-110 transition-transform duration-300" />
           </button>
+          
           {/* Hamburguesa solo en móvil */}
-          <button className="text-gold text-2xl ml-2 md:hidden bg-transparent p-0" onClick={() => setOpen(!open)} aria-label="Abrir menú">
+          <button className="text-gold text-2xl ml-2 md:hidden bg-transparent p-2 rounded-full hover:bg-gold/10 transition-all duration-300" onClick={() => setOpen(!open)} aria-label="Abrir menú">
             <FaBars />
           </button>
         </div>
       </div>
       {/* Menú móvil */}
       {open && (
-        <div className="md:hidden fixed inset-0 bg-white/95 z-40 flex flex-col">
+        <div className="md:hidden fixed inset-0 bg-white z-40 flex flex-col">
           <div className="flex justify-between items-center px-4 py-3 border-b border-gold">
             <img src={logo} alt="CalzaOro logo" className="h-16 w-16 object-contain" />
             <button
@@ -435,7 +469,7 @@ function Navbar({ onCategoryNav }) {
               onBlur={() => setTimeout(() => setShowSearchResults(false), 150)}
             />
             {showSearchResults && searchResults.length > 0 && (
-              <ul className="absolute left-0 top-12 w-full bg-white border border-gold rounded shadow z-50 max-h-60 overflow-y-auto">
+              <ul className="absolute left-0 top-12 w-full bg-white border border-gold rounded shadow z-[9998] max-h-60 overflow-y-auto">
                 {searchResults.map(product => (
                   <li
                     key={product._id}
@@ -453,7 +487,7 @@ function Navbar({ onCategoryNav }) {
               </ul>
             )}
             {showSearchResults && searchResults.length === 0 && (
-              <div className="absolute left-0 top-12 w-full bg-white border border-gold rounded shadow z-50 px-3 py-2 text-black text-sm">
+              <div className="absolute left-0 top-12 w-full bg-white border border-gold rounded shadow z-[9998] px-3 py-2 text-black text-sm">
                 No se encontraron productos.
               </div>
             )}
@@ -570,7 +604,7 @@ function Navbar({ onCategoryNav }) {
 
       {/* Modal Carrito */}
       {showCart && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black/40 z-[9998] flex items-center justify-center">
           <div className="bg-white rounded-2xl p-8 shadow-2xl relative min-w-[340px] max-w-lg w-full animate-fade-in-up">
             <button
               className="absolute top-2 right-2 text-gold text-2xl p-0 bg-transparent border-none shadow-none hover:text-dark transition"
@@ -646,7 +680,7 @@ function Navbar({ onCategoryNav }) {
 
       {/* Modal Favoritos */}
       {showFavorites && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black/40 z-[9998] flex items-center justify-center">
           <div className="bg-white rounded-2xl p-8 shadow-2xl relative min-w-[340px] max-w-lg w-full animate-fade-in-up">
             <button
               className="absolute top-2 right-2 text-gold text-2xl p-0 bg-transparent border-none shadow-none hover:text-dark transition"
@@ -688,7 +722,7 @@ function Navbar({ onCategoryNav }) {
 
       {/* Modal Login */}
       {showLogin && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black/40 z-[9998] flex items-center justify-center">
           <form
             className="bg-white rounded-2xl p-8 shadow-2xl relative min-w-[320px] max-w-xs w-full animate-fade-in-up flex flex-col gap-4"
             onSubmit={handleLogin}

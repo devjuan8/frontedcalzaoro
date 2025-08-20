@@ -127,31 +127,68 @@ function App() {
     <div className="bg-white min-h-screen flex flex-col">
       {/* Modal informativo al ingresar */}
       {showInfoModal && (
-        <div className="fixed inset-0 bg-black/60 z-[999] flex items-center justify-center animate-fade-in-up">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-xs w-full flex flex-col items-center relative border-2 border-gold">
+        <div className="fixed inset-0 bg-black/70 z-[9998] flex items-center justify-center animate-fade-in-up">
+          <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-sm w-full flex flex-col items-center relative border-2 border-gold/50 overflow-hidden">
+            {/* Elementos decorativos de fondo */}
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-gold via-yellow-400 to-gold"></div>
+            <div className="absolute -top-20 -right-20 w-40 h-40 bg-gold/10 rounded-full blur-3xl"></div>
+            <div className="absolute -bottom-20 -left-20 w-32 h-32 bg-yellow-400/10 rounded-full blur-3xl"></div>
+            
             <button
-              className="absolute top-2 right-2 text-gold text-2xl p-0 bg-transparent border-none shadow-none hover:text-dark transition"
+              className="absolute top-3 right-3 text-gold hover:text-dark transition-all duration-300 text-2xl p-2 bg-white/80 hover:bg-gold/20 rounded-full hover:scale-110 shadow-lg"
               onClick={() => setShowInfoModal(false)}
               aria-label="Cerrar"
               type="button"
             >
               ×
             </button>
-            <img src={logo} alt="CalzaOro logo" className="h-20 w-20 object-contain mb-4" />
-            <h2 className="text-xl font-bold text-gold text-center mb-2 font-serif">¿Cómo comprar?</h2>
-            <p className="text-black text-base text-center mb-2">Agrega los productos que te interesen al carrito y luego haz tu pedido fácilmente por <span className="font-bold text-green-600">WhatsApp</span>.</p>
-            <p className="text-black text-sm text-center">¡Así de simple! Si tienes dudas, escríbenos.</p>
+            
+            <div className="relative mb-6">
+              <img src={logo} alt="CalzaOro logo" className="h-24 w-24 object-contain drop-shadow-lg" />
+              <div className="absolute inset-0 bg-gold/20 rounded-full blur-xl opacity-60"></div>
+            </div>
+            
+            <h2 className="text-2xl font-bold text-gold text-center mb-4 font-serif bg-gradient-to-r from-gold to-yellow-500 bg-clip-text text-transparent">
+              ¿Cómo comprar?
+            </h2>
+            
+            <div className="space-y-3 text-center">
+              <p className="text-black text-base leading-relaxed">
+                Agrega los productos que te interesen al carrito y luego haz tu pedido fácilmente por 
+                <span className="font-bold text-green-600 mx-1">WhatsApp</span>.
+              </p>
+              <p className="text-black text-sm text-gray-600">
+                ¡Así de simple! Si tienes dudas, escríbenos.
+              </p>
+            </div>
+            
+            {/* Botón de acción */}
+            <button
+              onClick={() => setShowInfoModal(false)}
+              className="mt-6 bg-gradient-to-r from-gold to-yellow-500 text-black font-bold px-6 py-3 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 transform hover:-translate-y-1"
+            >
+              ¡Entendido!
+            </button>
           </div>
         </div>
       )}
       <Navbar onCategoryNav={handleCategoryNav} />
       <main className="container mx-auto px-4 pt-20 sm:pt-28 pb-12 flex-1">
         <Hero />
-        <section id="categorias" className="mt-8">
+        <section id="categorias" className="mt-12">
           {!selectedCategory ? (
             <>
-              <h2 className="text-3xl font-bold mb-8 text-black text-center font-serif">Categorías de productos</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
+              <div className="text-center mb-12">
+                <h2 className="text-4xl font-bold mb-4 text-black font-serif bg-gradient-to-r from-gold to-yellow-500 bg-clip-text text-transparent">
+                  Categorías de productos
+                </h2>
+                <p className="text-gray-600 text-lg max-w-2xl mx-auto leading-relaxed">
+                  Explora nuestra amplia colección de productos organizados por categorías para encontrar exactamente lo que buscas
+                </p>
+                <div className="w-24 h-1 bg-gradient-to-r from-gold to-yellow-500 mx-auto mt-4 rounded-full"></div>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-12">
                 {mainCategories.map(cat => {
                   const subIds = [cat._id]
                   cat.subcategories?.forEach(sub => {
@@ -165,7 +202,7 @@ function App() {
                   return (
                     <div
                       key={cat._id}
-                      className="cursor-pointer focus:outline-none bg-transparent shadow-none border-none p-0"
+                      className="cursor-pointer focus:outline-none bg-transparent shadow-none border-none p-0 group"
                       onClick={() => setSelectedCategory(cat)}
                       tabIndex={0}
                       role="button"
