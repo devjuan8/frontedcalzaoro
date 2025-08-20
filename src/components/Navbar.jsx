@@ -195,7 +195,7 @@ function Navbar({ onCategoryNav }) {
       const precio = (p.precioOferta && p.precioOferta < p.precioNormal)
         ? p.precioOferta
         : p.precioNormal;
-      return `• ${p.nombre}${p.variante && p.variante.talla ? ` (Talla: ${p.variante.talla})` : ''} - $${precio?.toLocaleString('es-CO') || ''}`;
+      return `• ${p.nombre}${p.referencia ? ` (Ref: ${p.referencia})` : ''}${p.variante && p.variante.talla ? ` (Talla: ${p.variante.talla})` : ''} - $${precio?.toLocaleString('es-CO') || ''}`;
     }).join('\n') +
     `\n\n*Total:* $${cartTotal.toLocaleString('es-CO')}\n\n` +
     `Quedo atento/a para coordinar el pago y la entrega. ¡Muchas gracias!`
@@ -682,6 +682,9 @@ function Navbar({ onCategoryNav }) {
                       <img src={item.imagen} alt={item.nombre} className="w-14 h-14 object-cover rounded-lg border border-gold" />
                       <div className="flex-1">
                         <div className="font-bold text-black">{item.nombre}</div>
+                        {item.referencia && (
+                          <div className="text-sm text-gray-600">Ref: {item.referencia}</div>
+                        )}
                         {item.variante && (
                           <div className="text-sm text-black/80">{item.variante.color} | Talla {item.variante.talla}</div>
                         )}
@@ -757,6 +760,9 @@ function Navbar({ onCategoryNav }) {
                     <img src={item.imagen} alt={item.nombre} className="w-14 h-14 object-cover rounded-lg border border-gold" />
                     <div className="flex-1">
                       <div className="font-bold text-black">{item.nombre}</div>
+                      {item.referencia && (
+                        <div className="text-sm text-gray-600">Ref: {item.referencia}</div>
+                      )}
                       <div className="text-gold font-bold text-base">${item.precioNormal?.toLocaleString()}</div>
                     </div>
                     <button
