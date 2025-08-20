@@ -28,14 +28,6 @@ function App() {
         const prodRes = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/productos`)
         const productosData = await prodRes.json()
         setProductos(productosData)
-
-        // Construir árbol de categorías
-        const tree = buildCategoryTree(categoriasData)
-        setCategoriaTree(tree)
-
-        // Construir categorías principales
-        const mainCats = buildMainCategories(categoriasData, tree)
-        setMainCategories(mainCats)
       } catch (error) {
         console.error('Error cargando datos:', error)
       }
@@ -43,6 +35,19 @@ function App() {
 
     fetchData()
   }, [])
+
+  // Construir árbol de categorías y categorías principales cuando ambos arrays estén disponibles
+  useEffect(() => {
+    if (categorias.length > 0 && productos.length > 0) {
+      // Construir árbol de categorías
+      const tree = buildCategoryTree(categorias)
+      setCategoriaTree(tree)
+
+      // Construir categorías principales
+      const mainCats = buildMainCategories(categorias, tree)
+      setMainCategories(mainCats)
+    }
+  }, [categorias, productos])
 
   // Construir árbol de categorías
   const buildCategoryTree = (categorias) => {
@@ -65,38 +70,84 @@ function App() {
 
   // Construir categorías principales para mostrar en la página principal
   const buildMainCategories = (categorias, tree) => {
+    console.log('🔍 buildMainCategories ejecutándose con:', {
+      totalCategorias: categorias.length,
+      totalProductos: productos.length,
+      productosActivos: productos.filter(p => p.activa).length
+    })
+    
     const mainCats = []
     
-    // Encontrar categorías raíz (sin padre)
-    const rootCategories = categorias.filter(cat => !cat.padre && cat.activa)
+    // Helper function to check if a category or its descendants have active products
+    const hasActiveProducts = (categoryId) => {
+      // Check if the category itself has active products
+      if (productos.some(p => p.categoria?._id === categoryId && p.activa)) {
+        return true;
+      }
+      // Check if any of its direct children have active products
+      const categoryNode = tree[categoryId];
+      if (categoryNode && categoryNode.hijos) {
+        for (const hijo of categoryNode.hijos) {
+          if (hijo.activa && hasActiveProducts(hijo._id)) { // Recursively check children
+            return true;
+          }
+        }
+      }
+      return false;
+    };
+    
+    // Encontrar categorías raíz (sin padre) y filtrar por activa y si tienen productos
+    const rootCategories = categorias.filter(cat => !cat.padre && cat.activa && hasActiveProducts(cat._id));
+    
+    console.log('📊 Categorías raíz encontradas:', rootCategories.map(cat => ({
+      nombre: cat.nombre,
+      activa: cat.activa,
+      tieneProductos: hasActiveProducts(cat._id)
+    })))
     
     // Para cada categoría raíz, construir su estructura
     rootCategories.forEach(root => {
-      const rootNode = tree[root._id]
-      if (rootNode && rootNode.hijos.length > 0) {
-        mainCats.push({
-          _id: root._id,
-          nombre: root.nombre,
-          activa: root.activa,
-          subcategories: rootNode.hijos
-            .filter(hijo => hijo.activa)
-            .map(hijo => ({
+      const rootNode = tree[root._id];
+      if (rootNode) {
+        // Build subcategories, filtering them based on active products
+        const subcategoriesWithProducts = rootNode.hijos
+          .filter(hijo => hijo.activa && hasActiveProducts(hijo._id)) // Filter active children that have products
+          .map(hijo => {
+            // Build sub-subcategories, filtering them based on active products
+            const subSubcategoriesWithProducts = hijo.hijos
+              .filter(nieto => nieto.activa && hasActiveProducts(nieto._id)) // Filter active grandchildren that have products
+              .map(nieto => ({
+                _id: nieto._id,
+                nombre: nieto.nombre,
+                activa: nieto.activa
+              }));
+            
+            return {
               _id: hijo._id,
               nombre: hijo.nombre,
               activa: hijo.activa,
-              subcategories: hijo.hijos
-                .filter(nieto => nieto.activa)
-                .map(nieto => ({
-                  _id: nieto._id,
-                  nombre: nieto.nombre,
-                  activa: nieto.activa
-                }))
-            }))
-        })
+              subcategories: subSubcategoriesWithProducts
+            };
+          });
+        
+        // Only include root categories that have active subcategories with products
+        if (subcategoriesWithProducts.length > 0) {
+          mainCats.push({
+            _id: root._id,
+            nombre: root.nombre,
+            activa: root.activa,
+            subcategories: subcategoriesWithProducts
+          });
+        }
       }
-    })
+    });
     
-    return mainCats
+    console.log('✅ Categorías principales finales:', mainCats.map(cat => ({
+      nombre: cat.nombre,
+      subcategorias: cat.subcategories.length
+    })))
+    
+    return mainCats;
   }
 
   // Nuevo handler para navegación desde el Navbar
