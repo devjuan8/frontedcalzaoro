@@ -26,6 +26,9 @@ function AdminDashboard() {
   const [editCatNombre, setEditCatNombre] = useState("");
   const [editandoProducto, setEditandoProducto] = useState(null);
   const [editProdImagen, setEditProdImagen] = useState(null);
+  const [busquedaProducto, setBusquedaProducto] = useState("");
+  const [filtroCategoria, setFiltroCategoria] = useState("");
+  const [filtroEstado, setFiltroEstado] = useState("todos");
 
   // Validar token
   useEffect(() => {
@@ -446,6 +449,23 @@ function AdminDashboard() {
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
 
+  // Filtrar productos
+  const productosFiltrados = productos.filter(p => {
+    const coincideBusqueda = !busquedaProducto || 
+      p.nombre.toLowerCase().includes(busquedaProducto.toLowerCase()) ||
+      p.referencia.toLowerCase().includes(busquedaProducto.toLowerCase());
+    const coincideCategoria = !filtroCategoria || p.categoria?._id === filtroCategoria;
+    const coincideEstado = filtroEstado === "todos" || 
+      (filtroEstado === "activos" && p.activa) ||
+      (filtroEstado === "inactivos" && !p.activa);
+    return coincideBusqueda && coincideCategoria && coincideEstado;
+  });
+
+  // Estadísticas
+  const totalProductos = productos.length;
+  const productosActivos = productos.filter(p => p.activa).length;
+  const productosOferta = productos.filter(p => p.esOferta).length;
+
   if (checking) return <div className="text-center py-20 text-black">Verificando acceso...</div>;
 
   return (
@@ -514,82 +534,166 @@ function AdminDashboard() {
 
         {/* Ver productos */}
         {view === "productos" && (
-          <div>
-            <h2 className="text-base md:text-lg font-bold text-black mb-4">Productos recientes</h2>
-            <div className="bg-white border border-gold rounded-xl overflow-hidden shadow">
-              <div className="overflow-x-auto">
-                <table className="min-w-full">
-                  <thead>
-                    <tr className="bg-gold text-dark">
-                      <th className="py-3 px-2 md:px-4 text-left font-bold text-xs md:text-sm">Imagen</th>
-                      <th className="py-3 px-2 md:px-4 text-left font-bold text-xs md:text-sm">Nombre</th>
-                      <th className="py-3 px-2 md:px-4 text-left font-bold text-xs md:text-sm hidden md:table-cell">Referencia</th>
-                      <th className="py-3 px-2 md:px-4 text-left font-bold text-xs md:text-sm">Precio</th>
-                      <th className="py-3 px-2 md:px-4 text-left font-bold text-xs md:text-sm hidden lg:table-cell">Oferta</th>
-                      <th className="py-3 px-2 md:px-4 text-left font-bold text-xs md:text-sm hidden lg:table-cell">Categoría</th>
-                      <th className="py-3 px-2 md:px-4 text-left font-bold text-xs md:text-sm hidden md:table-cell">Estado</th>
-                      <th className="py-3 px-2 md:px-4 text-left font-bold text-xs md:text-sm">Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {productos.map((p, index) => (
-                      <tr key={p._id} className={`border-t border-gold/20 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
-                        <td className="py-3 px-2 md:px-4">
-                          {p.imagen ? (
-                            <img src={p.imagen} alt={p.nombre} className="w-12 h-12 md:w-16 md:h-16 object-cover rounded" />
-                          ) : (
-                            <div className="w-12 h-12 md:w-16 md:h-16 bg-gray-200 rounded flex items-center justify-center">
-                              <span className="text-gray-400 text-xs">Sin img</span>
-                            </div>
-                          )}
-                        </td>
-                        <td className="py-3 px-2 md:px-4">
-                          <div className="font-semibold text-black text-xs md:text-sm">{p.nombre}</div>
-                          <div className="text-gray-600 text-xs md:hidden">{p.referencia}</div>
-                        </td>
-                        <td className="py-3 px-2 md:px-4 text-black text-xs md:text-sm hidden md:table-cell">{p.referencia}</td>
-                        <td className="py-3 px-2 md:px-4">
-                          <div className="text-black text-xs md:text-sm font-semibold">${p.precioNormal?.toLocaleString()}</div>
-                          {p.esOferta && (
-                            <div className="text-red-600 text-xs">Oferta: ${p.precioOferta?.toLocaleString()}</div>
-                          )}
-                        </td>
-                        <td className="py-3 px-2 md:px-4 text-black text-xs md:text-sm hidden lg:table-cell">
-                          {p.esOferta ? (
-                            <div>
-                              <span className="text-green-600 font-bold">Sí</span>
-                              {p.descuento && <div className="text-xs text-red-600">-{p.descuento}%</div>}
-                            </div>
-                          ) : (
-                            <span className="text-gray-500">No</span>
-                          )}
-                        </td>
-                        <td className="py-3 px-2 md:px-4 text-black text-xs md:text-sm hidden lg:table-cell">{p.categoria?.nombre}</td>
-                        <td className="py-3 px-2 md:px-4 hidden md:table-cell">
-                          <span className={`px-2 py-1 rounded-full text-xs font-bold ${p.activa ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                            {p.activa ? "Activa" : "Inactiva"}
-                          </span>
-                        </td>
-                        <td className="py-3 px-2 md:px-4">
-                          <div className="flex flex-col gap-1">
-                            <button 
-                              className="bg-blue-500 text-white rounded px-2 py-1 text-xs hover:bg-blue-700 transition"
-                              onClick={() => iniciarEdicion(p)}
-                            >
-                              Editar
-                            </button>
-                            <button 
-                              className="bg-red-500 text-white rounded px-2 py-1 text-xs hover:bg-red-700 transition"
-                              onClick={() => handleEliminarProducto(p)}
-                            >
-                              Eliminar
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
+          <div className="space-y-6">
+            {/* Estadísticas */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-white border-2 border-gold rounded-xl p-4 shadow-md">
+                <div className="text-sm text-gray-600 mb-1">Total Productos</div>
+                <div className="text-3xl font-bold text-gold">{totalProductos}</div>
+              </div>
+              <div className="bg-white border-2 border-green-500 rounded-xl p-4 shadow-md">
+                <div className="text-sm text-gray-600 mb-1">Productos Activos</div>
+                <div className="text-3xl font-bold text-green-600">{productosActivos}</div>
+              </div>
+              <div className="bg-white border-2 border-red-500 rounded-xl p-4 shadow-md">
+                <div className="text-sm text-gray-600 mb-1">En Oferta</div>
+                <div className="text-3xl font-bold text-red-600">{productosOferta}</div>
+              </div>
+            </div>
+
+            {/* Filtros y búsqueda */}
+            <div className="bg-white border border-gold rounded-xl p-4 shadow-md">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-black mb-2">Buscar producto</label>
+                  <input
+                    type="text"
+                    placeholder="Nombre o referencia..."
+                    className="w-full border border-gold rounded-lg px-4 py-2 text-black focus:outline-none focus:ring-2 focus:ring-gold"
+                    value={busquedaProducto}
+                    onChange={(e) => setBusquedaProducto(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-black mb-2">Filtrar por categoría</label>
+                  <select
+                    className="w-full border border-gold rounded-lg px-4 py-2 text-black focus:outline-none focus:ring-2 focus:ring-gold"
+                    value={filtroCategoria}
+                    onChange={(e) => setFiltroCategoria(e.target.value)}
+                  >
+                    <option value="">Todas las categorías</option>
+                    {categoriaLeaves.map((c) => (
+                      <option key={c._id} value={c._id}>
+                        {c.path.join(" > ")}
+                      </option>
                     ))}
-                  </tbody>
-                </table>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-black mb-2">Filtrar por estado</label>
+                  <select
+                    className="w-full border border-gold rounded-lg px-4 py-2 text-black focus:outline-none focus:ring-2 focus:ring-gold"
+                    value={filtroEstado}
+                    onChange={(e) => setFiltroEstado(e.target.value)}
+                  >
+                    <option value="todos">Todos</option>
+                    <option value="activos">Activos</option>
+                    <option value="inactivos">Inactivos</option>
+                  </select>
+                </div>
+              </div>
+              {productosFiltrados.length !== productos.length && (
+                <div className="mt-4 text-sm text-gray-600">
+                  Mostrando {productosFiltrados.length} de {productos.length} productos
+                </div>
+              )}
+            </div>
+
+            {/* Tabla de productos mejorada */}
+            <div className="bg-white border border-gold rounded-xl overflow-hidden shadow-lg">
+              <div className="p-4 border-b border-gold bg-gold/10">
+                <h2 className="text-lg md:text-xl font-bold text-black">Lista de Productos</h2>
+              </div>
+              <div className="overflow-x-auto">
+                {productosFiltrados.length === 0 ? (
+                  <div className="p-8 text-center text-gray-500">
+                    <p className="text-lg">No se encontraron productos</p>
+                    <p className="text-sm mt-2">Intenta ajustar los filtros de búsqueda</p>
+                  </div>
+                ) : (
+                  <table className="min-w-full divide-y divide-gold/20">
+                    <thead className="bg-gold">
+                      <tr>
+                        <th className="py-4 px-6 text-left font-bold text-dark text-sm">Imagen</th>
+                        <th className="py-4 px-6 text-left font-bold text-dark text-sm">Producto</th>
+                        <th className="py-4 px-6 text-left font-bold text-dark text-sm hidden md:table-cell">Referencia</th>
+                        <th className="py-4 px-6 text-left font-bold text-dark text-sm">Precio</th>
+                        <th className="py-4 px-6 text-left font-bold text-dark text-sm hidden lg:table-cell">Oferta</th>
+                        <th className="py-4 px-6 text-left font-bold text-dark text-sm hidden lg:table-cell">Categoría</th>
+                        <th className="py-4 px-6 text-left font-bold text-dark text-sm hidden md:table-cell">Estado</th>
+                        <th className="py-4 px-6 text-center font-bold text-dark text-sm">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gold/20">
+                      {productosFiltrados.map((p, index) => (
+                        <tr key={p._id} className={`hover:bg-gold/5 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
+                          <td className="py-4 px-6">
+                            {p.imagen ? (
+                              <img src={p.imagen} alt={p.nombre} className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-lg border border-gold/30 shadow-sm" />
+                            ) : (
+                              <div className="w-16 h-16 md:w-20 md:h-20 bg-gray-200 rounded-lg flex items-center justify-center border border-gold/30">
+                                <span className="text-gray-400 text-xs">Sin img</span>
+                              </div>
+                            )}
+                          </td>
+                          <td className="py-4 px-6">
+                            <div className="font-semibold text-black text-sm md:text-base">{p.nombre}</div>
+                            <div className="text-gray-600 text-xs md:hidden mt-1">{p.referencia}</div>
+                          </td>
+                          <td className="py-4 px-6 text-black text-sm hidden md:table-cell">
+                            <span className="text-gray-600">{p.referencia}</span>
+                          </td>
+                          <td className="py-4 px-6">
+                            <div className="text-black text-sm md:text-base font-semibold">
+                              ${p.precioNormal?.toLocaleString()}
+                            </div>
+                            {p.esOferta && p.precioOferta && (
+                              <div className="text-red-600 text-xs md:text-sm font-bold mt-1">
+                                Oferta: ${p.precioOferta?.toLocaleString()}
+                              </div>
+                            )}
+                          </td>
+                          <td className="py-4 px-6 text-black text-sm hidden lg:table-cell">
+                            {p.esOferta ? (
+                              <div className="flex flex-col">
+                                <span className="text-green-600 font-bold">Sí</span>
+                                {p.descuento && (
+                                  <span className="text-xs text-red-600 font-semibold">-{p.descuento}%</span>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-gray-500">No</span>
+                            )}
+                          </td>
+                          <td className="py-4 px-6 text-black text-sm hidden lg:table-cell">
+                            <span className="bg-gray-100 px-2 py-1 rounded text-xs">{p.categoria?.nombre || "Sin categoría"}</span>
+                          </td>
+                          <td className="py-4 px-6 hidden md:table-cell">
+                            <span className={`px-3 py-1 rounded-full text-xs font-bold ${p.activa ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                              {p.activa ? "Activa" : "Inactiva"}
+                            </span>
+                          </td>
+                          <td className="py-4 px-6">
+                            <div className="flex flex-col md:flex-row gap-2 justify-center">
+                              <button 
+                                className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-3 py-2 text-xs md:text-sm font-semibold transition shadow-sm"
+                                onClick={() => iniciarEdicion(p)}
+                              >
+                                Editar
+                              </button>
+                              <button 
+                                className="bg-red-500 hover:bg-red-600 text-white rounded-lg px-3 py-2 text-xs md:text-sm font-semibold transition shadow-sm"
+                                onClick={() => handleEliminarProducto(p)}
+                              >
+                                Eliminar
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
               </div>
             </div>
           </div>
