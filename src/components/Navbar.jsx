@@ -261,6 +261,38 @@ function Navbar({ onCategoryNav }) {
     }
   }
 
+  // Manejar clic en WhatsApp: registrar venta y luego abrir WhatsApp
+  const handleWhatsAppClick = async (e) => {
+    e.preventDefault()
+    
+    if (cart.length === 0) return
+
+    try {
+      // Preparar items para enviar al backend
+      const items = cart.map(item => ({
+        producto: item._id,
+        cantidad: 1, // Cada item en el carrito es cantidad 1
+        variante: item.variante || null
+      }))
+
+      // Registrar venta en el backend
+      await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/ventas/whatsapp`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ items })
+      })
+
+      // Abrir WhatsApp después de registrar la venta
+      window.open(cartWppUrl, '_blank')
+    } catch (error) {
+      console.error('Error al registrar venta:', error)
+      // Aún así abrir WhatsApp aunque falle el registro
+      window.open(cartWppUrl, '_blank')
+    }
+  }
+
   // Manejar login
   const handleLogin = async (e) => {
     e.preventDefault()
@@ -714,15 +746,13 @@ function Navbar({ onCategoryNav }) {
                   <span className="font-bold text-black text-lg">Total:</span>
                   <span className="font-bold text-gold text-xl">${cartTotal.toLocaleString()}</span>
                 </div>
-                <a
-                  href={cartWppUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className=" w-full text-center bg-gold text-dark font-bold py-3 rounded-full text-lg shadow hover:bg-dark hover:text-gold border-2 border-gold transition mb-2 flex items-center justify-center gap-2"
+                <button
+                  onClick={handleWhatsAppClick}
+                  className="w-full text-center bg-gold text-dark font-bold py-3 rounded-full text-lg shadow hover:bg-dark hover:text-gold border-2 border-gold transition mb-2 flex items-center justify-center gap-2"
                 >
                   <FaWhatsapp className="text-green-600 text-2xl" />
                   HACER PEDIDO POR WHATSAPP
-                </a>
+                </button>
                 <button
                   className="block w-full text-center text-sm text-red-500 hover:text-gold mt-1 p-2 bg-transparent border-none shadow-none"
                   onClick={clearCart}
